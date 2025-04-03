@@ -53,6 +53,9 @@ def handle_dialog(req: dict[str, Any], response: dict[str, Any]):
         response['response']['text'] = 'Слона можно найти на Яндекс.Маркете!'
         response['response']['end_session'] = True
         return
+    
+    response['response']['text'] = 'Все говорят "{}", а ты купи слона!'.format(req['request']['original_utterance'])
+    response['response']['buttons'] = get_suggests(user_id)
 
 
 def get_suggests(user_id: int):
