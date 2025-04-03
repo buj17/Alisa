@@ -38,30 +38,62 @@ def handle_dialog(req: dict[str, Any], response: dict[str, Any]):
                 'Не хочу.',
                 'Не буду.',
                 'Отстань!'
-            ]
+            ],
+            'elephant_purchased': False,
+            'bunny_purchased': False
         }
 
         response['response']['text'] = 'Привет! Купи слона'
-        response['response']['buttons'] = get_suggests(user_id)
+        response['response']['buttons'] = get_suggests(user_id, 'слон')
+        return
 
-    elif req['request']['original_utterance'].lower() in [
-        'ладно',
-        'куплю',
-        'покупаю',
-        'хорошо',
-        'я покупаю',
-        'я куплю'
-    ]:
-        response['response']['text'] = 'Слона можно найти на Яндекс.Маркете!'
+    if not session_storage[user_id]['elephant_purchased']:
+        if req['request']['original_utterance'].lower() in [
+            'ладно',
+            'куплю',
+            'покупаю',
+            'хорошо',
+            'я покупаю',
+            'я куплю'
+        ]:
+            response['response']['text'] = ('Слона можно найти на Яндекс.Маркете!\n'
+                                            'А теперь купи кролика!')
+            session_storage[user_id]['elephant_purchased'] = True
+        else:
+            response['response']['text'] = 'Все говорят "{}", а ты купи слона!'.format(
+                req['request']['original_utterance'])
+            response['response']['buttons'] = get_suggests(user_id, 'слон')
+
+    elif not session_storage[user_id]['bunny_purchased']:
+        if req['request']['original_utterance'].lower() in [
+            'ладно',
+            'куплю',
+            'покупаю',
+            'хорошо',
+            'я покупаю',
+            'я куплю'
+        ]:
+            response['response']['text'] = 'Кролика можно найти на Яндекс.Маркете!'
+            session_storage[user_id]['bunny_purchased'] = True
+        else:
+            response['response']['text'] = 'Все говорят "{}", а ты купи кролика!'.format(
+                req['request']['original_utterance'])
+            response['response']['buttons'] = get_suggests(user_id, 'кролик')
+
+    if session_storage[user_id]['elephant_purchased'] and session_storage[user_id]['bunny_purchased']:
         response['response']['end_session'] = True
         return
 
-    else:
-        response['response']['text'] = 'Все говорят "{}", а ты купи слона!'.format(req['request']['original_utterance'])
-        response['response']['buttons'] = get_suggests(user_id)
+
+def reset_suggests(user_id: int):
+    session_storage[user_id]['suggests'] = [
+        'Не хочу.',
+        'Не буду.',
+        'Отстань!'
+    ]
 
 
-def get_suggests(user_id: int):
+def get_suggests(user_id: int, prompt: str):
     session = session_storage[user_id]
 
     suggests: list[dict[str, Any]] = [
@@ -75,7 +107,7 @@ def get_suggests(user_id: int):
     if len(suggests) < 2:
         suggests.append({
             'title': 'Ладно',
-            'url': 'https://market.yandex.ru/search?text=слон',
+            'url': 'https://market.yandex.ru/search?text={}'.format(prompt),
             'hide': True
         })
 
