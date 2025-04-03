@@ -44,7 +44,7 @@ def handle_dialog(req: dict[str, Any], response: dict[str, Any]):
         response['response']['text'] = 'Привет! Купи слона'
         response['response']['buttons'] = get_suggests(user_id)
 
-    if req['request']['original_utterance'].lower() in [
+    elif req['request']['original_utterance'].lower() in [
         'ладно',
         'куплю',
         'покупаю',
