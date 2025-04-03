@@ -48,7 +48,9 @@ def handle_dialog(req: dict[str, Any], response: dict[str, Any]):
         'ладно',
         'куплю',
         'покупаю',
-        'хорошо'
+        'хорошо',
+        'я покупаю',
+        'я куплю'
     ]:
         response['response']['text'] = 'Слона можно найти на Яндекс.Маркете!'
         response['response']['end_session'] = True
